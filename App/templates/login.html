@@ -1,0 +1,77 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>WORKFLOW</title>
+
+<link href="/static/new/css/bootstrap.min.css" rel="stylesheet">
+<link href="/static/new/font-awesome/css/font-awesome.css" rel="stylesheet">
+<link href="/static/new/css/plugins/iCheck/custom.css" rel="stylesheet">
+<link href="/static/new/css/animate.css" rel="stylesheet">
+<link href="/static/new/css/style.css" rel="stylesheet">
+<link href="/static/new/css/ztree/zTreeStyle.css" rel="stylesheet">
+
+<style>
+    .gray-bg{background: #FFFFFF;}
+    .navbar-static-top{background:#ffffff;}
+    .voilet-margins{border:solid 1px #e7eaec;}
+    #side-menu {z-index: 9999;}
+    .default {z-index: 9999;}
+
+</style>
+<link href="/static/new/css/plugins/summernote/summernote.css" rel="stylesheet">
+<link href="/static/new/css/plugins/summernote/summernote-bs3.css" rel="stylesheet">
+
+</head>
+
+<body class="gray-bg">
+
+    <div class="middle-box text-center loginscreen  animated fadeInDown">
+        <div>
+            <div>
+
+                <div class="col-md-12 column">
+                    <img  src="/static/img/logo1.jpg" width="140" height="140" class="img-circle" />
+                </div>
+
+            </div>
+            <h3>欢迎使用工单管理系统</h3>
+            {% for message in get_flashed_messages() %}
+                {% if message.category == 'success' %}
+                    <div class="alert alert-success">{{ message }}</div>
+                {% elif message.category == 'error' %}
+                    <div class="alert alert-danger">{{ message }}</div>
+                {% else %}
+                    <div class="alert">{{ message }}</div>
+                {% endif %}
+            {% endfor %}
+            <!--<p>Login in. To see it in action.</p>-->
+
+            <form class="m-t" role="form" method="post" action="">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="用户名" value="" id="id_username" name='username' required="">
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-control" id="id_password" name="password"  placeholder="密码" required="">
+                </div>
+                <button type="submit"  class="btn btn-primary block full-width m-b">Login</button>
+
+                <input type="hidden" name="next" value="{{ next }}" />
+                <!--<a href="/accounts/resetpass/"><small>Forgot password?</small></a>-->
+                <!--<p class="text-muted text-center"><small>Do not have an account?</small></p>-->
+            </form>
+            <form method = "get" action="{{ url_for('book.register') }}">          <!-- 这里不能用post-->
+                <button type="submit" class="btn btn-primary m-b">注册</button>
+            </form>
+            <p class="m-t"> <small>WORKFLOW &copy; 2024</small> </p>
+        </div>
+    </div>
+
+</body>
+
+</html>

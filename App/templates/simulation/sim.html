@@ -1,0 +1,33 @@
+{% extends "common/layout_main.html" %}
+{% block content %}
+<div class="row  border-bottom">
+    <div class="col-lg-12">
+        <div class="tab_title">
+            <ul class="nav nav-pills">
+
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="row m-t">
+    <div class="col-lg-12 m-t middle-box text-center">
+        <form class="m-t" role="form" method="post" action="">
+            <div class="form-group">
+                <input type="text" class="form-control" placeholder="机器数量" value="" name='machine_num' required="">
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control" name="material_num"  placeholder="材料数量" required="">
+            </div>
+            <button type="submit"  style="text-align:center" class="btn btn-primary block m-b">Run</button>
+            <button type="submit"  class="btn btn-primary block m-b">Reset</button>
+            
+            <!--<a href="/accounts/resetpass/"><small>Forgot password?</small></a>-->
+            <!--<p class="text-muted text-center"><small>Do not have an account?</small></p>-->
+        </form>
+        <div class="form-group">
+        <input type="text" class="form-control" placeholder="求和" name="sum" value="{{ sum }}" />
+        </div>
+        <!--分页代码-->
+    </div>
+</div>
+{% endblock %}
