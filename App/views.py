@@ -1,7 +1,10 @@
 # 在views.py中放路由和视图函数
 
 from flask import Blueprint, request, render_template, url_for, redirect, flash, current_app, g
-from .models import * #后面是用views来控制数据库的，所以要在views中导入models文件
+from App.models.User.books import * #后面是用views来控制数据库的，所以要在views中导入models文件                 flask db migrate 代码在这里实现
+from App.models.User.user_model import *
+from App.models.Machine.machine_model import *
+from App.models.Material.material_model import *
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, EmailField

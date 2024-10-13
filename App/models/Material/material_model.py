@@ -1,6 +1,4 @@
-from ...exts import db 
-
-#机器
+from App.exts import db
 class Material(db.Model):
     __tablename__ = 'material' 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

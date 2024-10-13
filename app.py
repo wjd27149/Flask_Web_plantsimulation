@@ -1,6 +1,13 @@
+# 将App目录添加到项目路径，解决views里的文件导入models里的模型类时找不到models模块路径的问题
+import sys,os
+sys.path.append(os.getcwd() + "/APP/models")
+# sys.path.append(r'C:\Users\18525\Desktop\论文\flask_demo\APP\models')
+# print(sys.path)
+
 from App import creat_app
 from Clients.client import *
 import threading
+
 
 app = creat_app()
 
@@ -19,9 +26,9 @@ def client_recv_with_context(client):
 
 if __name__ == '__main__':
 
-    ip = "127.0.0.1"
-    port = 3000
-    client = connect_Server(ip, port)
+    # ip = "127.0.0.1"
+    # port = 3000
+    # client = connect_Server(ip, port)
     
     '''调用debug 模式'''
     run_flask_app_with_debug()

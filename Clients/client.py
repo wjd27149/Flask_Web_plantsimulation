@@ -2,7 +2,7 @@ import socket
 import threading
 import sys
 import pprint
-from App.models import BaseMachine,db
+from App.models.Machine.machine_model import BaseMachine,db
 
 def connect_Server(host, port):
     try:
@@ -12,7 +12,7 @@ def connect_Server(host, port):
         return client
     
     except socket.error as msg:
-        print(msg)
+        print("failed to connect!")
         sys.exit(1)
 
 def client_send():
