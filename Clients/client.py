@@ -22,10 +22,8 @@ def connect_Server(host, port):
         print("failed to connect!")
         sys.exit(1)
 
-def client_send():
-    while True:
-        msg = input("client input: ")
-        client.send(msg.encode('utf-8'))
+def client_send(client, msg):
+    client.send(msg.encode('utf-8'))
 
 def client_recv(client):
     # 刚连接上清除 mac1- 3 的数据

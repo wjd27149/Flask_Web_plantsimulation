@@ -11,6 +11,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, EmailField
 from wtforms.validators import InputRequired, Email, Length
 
+from Clients.client import client_send
+
 # 蓝图
 blue = Blueprint('book', __name__)
 
@@ -159,8 +161,9 @@ def sim_list(bid):
     current_user = User.query.get(bid)
     if request.method == 'POST':
         form = SumForm()
-        return redirect(url_for('book.sim_list',current_user = current_user, sum = "20", bid = current_user.id))
-
+        client_send(client= current_app.config.get('client'),msg = request.form.get('material_num'))
+        flash(message= "Message sent successfully!", category= "success") 
+    
     return render_template('simulation/sim.html',current_user = current_user)
 
 

@@ -8,6 +8,8 @@ from App import creat_app
 from Clients.client import *
 import threading
 
+# 声明一个全局变量 client
+client = None
 
 app = creat_app()
 
@@ -32,20 +34,17 @@ if __name__ == '__main__':
     ip = "127.0.0.1"
     port = 3000
     client = connect_Server(ip, port)
-    
+    # 存储 client 在 current_app.config 中
+    app.config['client'] = client
     try:
         # 创建两个线程
         flask_thread = threading.Thread(target=run_flask_app)
         communication_thread = threading.Thread(target=client_recv_with_context, args=(client,))
-        send_thread = threading.Thread(target= client_send)
-
-
 
         # 启动通信线程
         communication_thread.start()
         print("Communication thread started")
-        send_thread.start()
-        print("Send thread started")
+
 
         # 启动 Flask 应用的线程
         flask_thread.start()
@@ -54,7 +53,6 @@ if __name__ == '__main__':
         # 等待线程执行完毕
         flask_thread.join()
         communication_thread.join()
-        send_thread.join()
 
     except Exception as e:
         print(f"An error occurred: {e}")

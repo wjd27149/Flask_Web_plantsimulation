@@ -118,3 +118,8 @@ ChatGPT
 在 Flask 的 url_for 函数中，你不能直接传递一个对象（如 machine 类的实例）作为参数。你需要提取对象的属性（例如 id、name）并将这些属性作为参数传递给 URL。
 
 下面是一个修改后的示例，假设 machine 是一个对象，你可以从中提取 id 和 name 属性。
+
+
+在 app.py 中，你可以通过 current_app 来管理全局变量。使用 current_app.config['client'] 来存储 client，这样可以在任何地方使用它。
+
+如果是自己发送 就可以不用开第三个随时发送信息的线程
