@@ -6,7 +6,7 @@ class BaseMachine(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(30), nullable=False)
     type = db.Column(db.String(30))
-    
+
     # # Relationship to each machine type       不能 一对一 因为 mac1 是和事件有关的表 应该表对表
     # mac1 = db.relationship('Mac1', backref='base_machine', uselist=False)
     # mac2 = db.relationship('Mac2', backref='base_machine', uselist=False)
@@ -17,7 +17,7 @@ class BaseMac(db.Model):
     __abstract__  = True
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     time = db.Column(db.String(30), unique=True)
-    name = db.Column(db.String(30))
+    name = db.Column(db.String(30))    # 代表plant simulation 里面flow的名字
     type = db.Column(db.String(30))   # 假设 'True' 表示男
     state = db.Column(db.String(30))
     material = db.Column(db.String(30))

@@ -26,13 +26,13 @@ def client_recv_with_context(client):
 
 if __name__ == '__main__':
 
-    # ip = "127.0.0.1"
-    # port = 3000
-    # client = connect_Server(ip, port)
+    # '''调用debug 模式'''
+    # run_flask_app_with_debug()
+
+    ip = "127.0.0.1"
+    port = 3000
+    client = connect_Server(ip, port)
     
-    '''调用debug 模式'''
-    run_flask_app_with_debug()
-    '''
     try:
         # 创建两个线程
         flask_thread = threading.Thread(target=run_flask_app)
@@ -57,4 +57,4 @@ if __name__ == '__main__':
         send_thread.join()
 
     except Exception as e:
-        print(f"An error occurred: {e}")'''
+        print(f"An error occurred: {e}")

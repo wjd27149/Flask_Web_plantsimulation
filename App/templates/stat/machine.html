@@ -12,38 +12,53 @@
 
 <div class="row m-t">
     <div class="col-lg-12 m-t">
+    {% with messages=get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+    {% endwith %}
     <!--h1 class="mt-5">Delete BaseMachine Data</h1> 
         
     <!-- 使用 Bootstrap 表单和按钮 -->
-    <form action="/delete_basemachine/{{current_user.id}}" method="POST" class="mt-4">
+    <form action="/add_basemachine/{{current_user.id}}" method="POST" class="mt-4"  style="display:inline;">
+        <button type="submit" class="btn btn-success btn-lg" 
+                onclick="return confirm('Are you sure you want to add machines by default?');">
+            Add BaseMachine Records
+        </button>
+    </form>  
+
+    <form action="/delete_basemachine/{{current_user.id}}" method="POST" class="mt-4"  style="display:inline;">
         <button type="submit" class="btn btn-danger btn-lg" 
                 onclick="return confirm('Are you sure you want to delete all records?');">
-            Delete All BaseMachine Records
+            Delete All BaseMachine Details Records
         </button>
-    </form>        
+    </form>    
+  
         <table class="table table-bordered m-t">
             <thead>
             <tr>
-                <th class="text-center">time</th>
+                <th class="text-center">id</th>
                 <th class="text-center">name</th>
                 <th class="text-center">type</th>
-                <th class="text-center">state</th>
-                <th class="text-center">material</th>
+                <th class="text-center">link</th>
             </tr>
             </thead>
             <tbody>
                 {% if machines %}
                     {% for machine in machines %}
                 <tr>
-                    <td class="text-center">{{ machine.time }}</td>
+                    <td class="text-center">{{ machine.id }}</td>
                     <td class="text-center">{{ machine.name }}</td>
                     <td class="text-center">{{ machine.type }}</td>
-                    <td class="text-center">{{ machine.state }}</td>
-                    <td class="text-center">{{ machine.material }}</td>
+                    <td class="text-center">
+                        <a href="{{ url_for('book.machine_detail', id=machine.id, bid = current_user.id, _name = machine.name) }}" class="btn btn-warning">显示</a>
+                    </td>
                 </tr>
                     {% endfor %}
                 {% else %}
-                    <tr><td colspan="5">暂无数据~~</td></tr>
+                    <tr><td colspan="4">暂无数据~~</td></tr>
                 {% endif %}
             </tbody>
         </table>

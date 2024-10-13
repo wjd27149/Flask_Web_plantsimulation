@@ -106,3 +106,15 @@ db 是 exts.py 中的对象。
 from App.exts import db 使用了绝对导入，这是 Python 推荐的方式，它不依赖于文件所在的相对位置，而是基于项目的层次结构，从根目录开始查找模块。
 相对导入（例如 from .exts import db）虽然在模块内也可以工作，但依赖于导入的上下文和文件的相对路径，有时在运行脚本时会产生问题，尤其是当模块作为顶层脚本直接运行时。
 通过使用绝对导入 from App.exts import db，你可以避免相对路径的复杂性，确保 Python 在正确的模块路径中查找。
+
+
+                    <td class="text-center">
+                        <a href="{{ url_for('book.machine_detail', id=machine.id, bid = current_user.id, _name = machine.name) }}" class="btn btn-warning">显示</a>
+                    </td>
+我能不能直接传machine 类进去
+
+ChatGPT 说：
+ChatGPT
+在 Flask 的 url_for 函数中，你不能直接传递一个对象（如 machine 类的实例）作为参数。你需要提取对象的属性（例如 id、name）并将这些属性作为参数传递给 URL。
+
+下面是一个修改后的示例，假设 machine 是一个对象，你可以从中提取 id 和 name 属性。
