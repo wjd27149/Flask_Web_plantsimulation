@@ -1,0 +1,94 @@
+{% extends "common/layout_main.html" %}
+{% block content %}
+
+{% with messages=get_flashed_messages(with_categories=True) %}
+{% if messages %}
+    {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h1 class = text-center>工序管理</h1>
+        <a href="{{ url_for('book.workpiece_list', bid=current_user.id) }}" 
+        class="btn btn-secondary btn-lg">  <!-- 将btn-sm改为btn-lg -->
+        返回工件列表
+        </a>
+    </div>
+    
+    <div class="card-body">
+        <!-- 添加工序表单 -->
+        <form method="POST" action="{{ url_for('book.operation_add', user_id=current_user.id) }}" class="mb-4">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">工序ID*</label>
+                    <input type="text" name="o_id" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">工序名称</label>
+                    <input type="text" name="o_name" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">工序编码</label>
+                    <input type="text" name="o_number" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">工件ID*</label>
+                    <input type="text" name="o_job_id" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">机器名称*</label>
+                    <input type="text" name="o_machine_name" class="form-control" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">加工时间(分钟)*</label>
+                    <input type="number" name="o_time" class="form-control" required min="1">
+                </div>
+                <div class="col-md-10 text-center">  <!-- 调整列宽 -->
+                    <button type="submit" class="btn btn-primary w-100">添加</button>
+                </div>
+        </form>
+        <div>
+        <h1 class = "col-md-10 text-center">工序列表</h1>
+        </div>
+        <!-- 工序列表表格 -->
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>工序ID</th>
+                    <th>工序名称</th>
+                    <th>工序编码</th>
+                    <th>工件ID</th>
+                    <th>机器名称</th>
+                    <th>加工时间</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for op in operations %}
+                <tr>
+                    <td>{{ op.o_id }}</td>
+                    <td>{{ op.o_name }}</td>
+                    <td>{{ op.o_number }}</td>
+                    <td>{{ op.o_job_id }}</td>
+                    <td>{{ op.o_machine_name }}</td>
+                    <td>{{ op.o_time }}分钟</td>
+                    <td>
+                        <form method="POST" 
+                              action="{{ url_for('book.operation_delete', j_id=op.o_id, user_id=current_user.id) }}"
+                              onsubmit="return confirm('确定删除此工序吗？')">
+                            <button type="submit" class="btn btn-sm btn-danger">删除</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted">暂无工序数据</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

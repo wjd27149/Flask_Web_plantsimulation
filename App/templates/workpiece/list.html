@@ -1,0 +1,71 @@
+{% extends "common/layout_main.html" %}
+{% block content %}
+
+{% with messages=get_flashed_messages(with_categories=True) %}
+{% if messages %}
+    {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h1 class = text-center>工件列表</h1>
+        <a href="{{ url_for('book.workpiece_add', user_id=current_user.id) }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> 新增工件
+        </a>
+    </div>
+    <div class="card-body">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>工件ID</th>
+                    <th>工件名称</th>
+                    <th>客户</th>
+                    <th>订单编号</th>
+                    <th>数量</th>
+                    <th>状态</th>
+                    <th>创建时间</th>
+                    <th>交货时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for piece in pieces %}
+                <tr>
+                    <td>{{ piece.j_id }}</td>
+                    <td>{{ piece.j_number }}</td>
+                    <td>{{ piece.c_name }}</td>
+                    <td>{{ piece.p_number }}</td>
+                    <td>{{ piece.j_quantity }}</td>
+                    <td>
+                        <span class="badge bg-{{ 'success' if piece.j_state=='完成' else 'warning' }}">
+                            {{ piece.j_state }}
+                        </span>
+                    </td>
+                    <td>{{ piece.j_create_date.strftime('%Y-%m-%d %H:%M') if piece.j_create_date else '' }}</td>
+                    <td>{{ piece.j_due_date.strftime('%Y-%m-%d %H:%M') if piece.j_due_date else '' }}</td>
+                    <td>
+                        <div style="display: flex; gap: 5px;">
+                            <form action="{{ url_for('book.operation_list_by_id', j_id=piece.j_id, user_id=current_user.id) }}" 
+                            method="POST" style="margin: 0;">
+                          <button class="btn btn-sm">工序</button>
+                            </form>
+                            <a href="#" class="btn btn-sm btn-warning">编辑</a>
+                            <form action="{{ url_for('book.workpiece_delete', j_id=piece.j_id, user_id=current_user.id) }}" 
+                                  method="POST" style="margin: 0;">
+                                <button class="btn btn-sm btn-danger" 
+                                        onclick="return confirm('确定删除吗？')">删除</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+{% endblock %}

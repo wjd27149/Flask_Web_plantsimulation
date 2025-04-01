@@ -1,0 +1,45 @@
+{% extends "common/layout_main.html" %}
+{% block content %}
+
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h1 class = text-center>工序管理 - 工件ID: {{ j_id }}</h1>
+        <a href="{{ url_for('book.workpiece_list', bid=current_user.id) }}" 
+        class="btn btn-secondary btn-lg">  <!-- 将btn-sm改为btn-lg -->
+        返回工件列表
+        </a>
+    </div>
+        <div>
+        <h1 class = "col-md-10 text-center">工序列表</h1>
+        </div>
+        <!-- 工序列表表格 -->
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>工序编码</th>                    
+                    <th>工序名称</th>
+
+                    <th>机器名称</th>
+                    <th>加工时间</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for op in operations %}
+                <tr>
+                    <td>{{ op.o_number }}</td>                    
+                    <td>{{ op.o_name }}</td>
+
+                    <td>{{ op.o_machine_name }}</td>
+                    <td>{{ op.o_time }}分钟</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted">暂无工序数据</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

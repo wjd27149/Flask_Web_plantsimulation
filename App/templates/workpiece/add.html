@@ -1,0 +1,48 @@
+{% extends "common/layout_main.html" %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h1 class="text-center">添加新工件</h1>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label">工件ID*</label>
+                <input type="text" name="j_id" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">工件名称*</label>
+                <input type="text" name="j_number" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">客户名称</label>
+                <input type="text" name="c_name" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">订单编号</label>
+                <input type="text" name="p_number" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">工件数量*</label>
+                <input type="number" name="j_quantity" class="form-control" required min="1">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">创建时间</label>
+                <input type="datetime-local" name="j_create_date" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">交货时间</label>
+                <input type="datetime-local" name="j_due_date" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">备注</label>
+                <textarea name="j_remark" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary">提交</button>
+                <a href="{{ url_for('book.workpiece_list', bid=current_user.id) }}" class="btn btn-secondary">取消</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

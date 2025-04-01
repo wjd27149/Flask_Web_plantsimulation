@@ -21,38 +21,38 @@ def run_flask_app():
 def run_flask_app_with_debug():
     app.run(host='127.0.0.1', port=5000, threaded=True, debug= True)
 
-def client_recv_with_context(client):
-    # 手动推送 Flask 应用的上下文
-    with app.app_context():
-        client_recv(client)
+# def client_recv_with_context(client):
+#     # 手动推送 Flask 应用的上下文
+#     with app.app_context():
+#         client_recv(client)
 
 if __name__ == '__main__':
 
     # '''调用debug 模式'''
-    # run_flask_app_with_debug()
+    run_flask_app_with_debug()
 
-    ip = "127.0.0.1"
-    port = 3000
-    client = connect_Server(ip, port)
-    # 存储 client 在 current_app.config 中
-    app.config['client'] = client
-    try:
-        # 创建两个线程
-        flask_thread = threading.Thread(target=run_flask_app)
-        communication_thread = threading.Thread(target=client_recv_with_context, args=(client,))
+    # ip = "127.0.0.1"
+    # port = 3000
+    # client = connect_Server(ip, port)
+    # # 存储 client 在 current_app.config 中
+    # app.config['client'] = client
+    # try:
+    #     # 创建两个线程
+    #     flask_thread = threading.Thread(target=run_flask_app)
+    #     communication_thread = threading.Thread(target=client_recv_with_context, args=(client,))
 
-        # 启动通信线程
-        communication_thread.start()
-        print("Communication thread started")
+    #     # 启动通信线程
+    #     communication_thread.start()
+    #     print("Communication thread started")
 
 
-        # 启动 Flask 应用的线程
-        flask_thread.start()
-        print("Flask thread started")        
+    #     # 启动 Flask 应用的线程
+    #     flask_thread.start()
+    #     print("Flask thread started")        
 
-        # 等待线程执行完毕
-        flask_thread.join()
-        communication_thread.join()
+    #     # 等待线程执行完毕
+    #     flask_thread.join()
+    #     communication_thread.join()
 
-    except Exception as e:
-        print(f"An error occurred: {e}")
+    # except Exception as e:
+    #     print(f"An error occurred: {e}")

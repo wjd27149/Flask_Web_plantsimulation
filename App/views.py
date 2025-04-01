@@ -1,17 +1,19 @@
 # 在views.py中放路由和视图函数
 
 from flask import Blueprint, request, render_template, url_for, redirect, flash, current_app, g
-from App.models.User.books import * #后面是用views来控制数据库的，所以要在views中导入models文件                 flask db migrate 代码在这里实现
+ #后面是用views来控制数据库的，所以要在views中导入models文件                 flask db migrate 代码在这里实现
 from App.models.User.user_model import *
 from App.models.Machine.machine_model import *
-from App.models.Material.material_model import *
+from App.models.Material.Workpiece import *
 from sqlalchemy import text
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, EmailField
 from wtforms.validators import InputRequired, Email, Length
 
-from Clients.client import client_send
+# from Clients.client import client_send
+import subprocess  # 必须添加的导入
+import math
 
 # 蓝图
 blue = Blueprint('book', __name__)
@@ -22,11 +24,6 @@ users = {
     "user": " "
 }
 
-machine_models = {
-    1: Mac1,
-    2: Mac2,
-    3: Mac3
-}
 machine_names = ["压接1","压接2","压接3"]
 machine_types = ["A","B","C"]
 class RegistrationForm(FlaskForm):
@@ -95,97 +92,281 @@ def machine_list(bid):
 @blue.route('/delete_basemachine/<int:bid>', methods=['POST'])
 def delete_basemachine(bid):
     try:
-        # 删除 BaseMachine 表对应机器的所有记录
-        # machine_models 字典的键应该是从 1 开始而不是 0 开始。
-        # 根据你的代码，i 从 0 到 2 进行循环，而如果字典中没有以 0 开头的条目，get(i) 将返回 None。
-        for i in range(1,4):
-            machine_model = machine_models.get(i)
-            db.session.query(machine_model).delete()
-            db.session.commit()
-        flash("All records deleted successfully", category='success')
-
+        db.session.query(BaseMachine).delete()
+        db.session.commit()
+        # flash("删除成功", 'success')
     except Exception as e:
         db.session.rollback()
-        current_app.logger.info(f"Error: {str(e)}")
-        flash(f"Error: {str(e)}", category='error')
+        # flash(f"删除失败: {str(e)}", 'danger')
 
     # 重定向到machine 页面
     machines = BaseMachine.query.all()
     current_user = User.query.get(bid)
     return render_template('stat/machine.html',machines = machines,current_user = current_user)
 
-@blue.route('/add_basemachine/<int:bid>', methods=['POST'])
-def add_basemachine(bid):
-    try:
-        #  先把所有存在的都清除
-        db.session.query(BaseMachine).delete()
-        db.session.commit()
-        # 重置自增计数器
-        # text() 函数：使用 text() 将 SQL 语句包装起来，以使 SQLAlchemy 明白这是一个原始 SQL 语句。
-        db.session.execute(text('ALTER TABLE basemachine AUTO_INCREMENT = 1;'))
-        db.session.commit()
-        for i in range(3):
-            mac = BaseMachine(name = machine_names[i], type = machine_types[i])
-            db.session.add(mac)
+@blue.route('/machine/add/<int:user_id>', methods=['GET', 'POST'])
+def add_machine(user_id):
+    if request.method == 'POST':
+        try:
+            # 获取表单数据
+            new_machine = BaseMachine(
+                m_id=request.form.get('m_id'),          # 机床ID
+                m_number=request.form.get('m_number'),  # 机床编码
+                m_name=request.form.get('m_name'),      # 机床名称
+                m_state=request.form.get('m_state'),    # 机床状态
+                m_time=0.0,                             # 初始运行时间
+                m_workshop=request.form.get('m_workshop')  # 所在车间
+            )
+            
+            db.session.add(new_machine)
             db.session.commit()
-        flash("All machines added successfully", category='success')
-    except Exception as e:
-        db.session.rollback()
-        flash(f"Error: {str(e)}", category='error')
+            # flash('机器添加成功', 'success')
+            return redirect(url_for('book.machine_list', bid=user_id))
+            
+        except Exception as e:
+            db.session.rollback()
+            # flash(f'添加失败: {str(e)}', 'danger')
 
-    current_user = User.query.get(bid)
-    machines = BaseMachine.query.all()
-    return render_template('stat/machine.html',machines = machines,current_user = current_user)
-
-@blue.route('/machine_detail/<int:id>/<int:bid>')
-def machine_detail(id,bid):
-    current_user = User.query.get(bid)
-
-    # 使用字典映射来简化机器模型的选择
-    mac_model = machine_models.get(id)
-    if mac_model is None:
-        # 如果 id 不在字典中，返回 404 错误
-        return "Machine type not found", 404
-    
-    mac = mac_model.query.all()  # 查询对应类型的所有机器
-    return render_template('stat/show_machine.html',_id = id,machines = mac,current_user = current_user)
-
-@blue.route('/material/<int:bid>')
-def material_list(bid):
-    materials = BaseMaterial.query.all()
-    current_user = User.query.get(bid)
-    return render_template('stat/material.html',materials = materials,current_user = current_user)
+    # GET请求显示表单页面
+    current_user = User.query.get(user_id)
+    return render_template('stat/machine_add.html', current_user=current_user)
 
 @blue.route('/simulation/<int:bid>', methods=['GET', 'POST'])
 def sim_list(bid):
     current_user = User.query.get(bid)
-    if request.method == 'POST':
-        form = SumForm()
-        client_send(client= current_app.config.get('client'),msg = request.form.get('material_num'))
-        flash(message= "Message sent successfully!", category= "success") 
+    # if request.method == 'POST':
+    #     form = SumForm()
+    #     client_send(client= current_app.config.get('client'),msg = request.form.get('material_num'))
+    #     flash(message= "Message sent successfully!", category= "success") 
     
     return render_template('simulation/sim.html',current_user = current_user)
 
+@blue.route('/machine/delete/<int:machine_id>/<int:user_id>', methods=['POST'])
+def machine_delete(machine_id,user_id):
+    try:
+        machine = BaseMachine.query.get_or_404(machine_id)
+        db.session.delete(machine)
+        db.session.commit()
+        # flash('删除成功', 'success')
+    except Exception as e:
+        db.session.rollback()
+        # flash(f'删除失败: {str(e)}', 'danger')
+    # 保持原重定向方式
+    return redirect(url_for('book.machine_list', bid=user_id))
 
-'''
-@blue.route('/booklist/')
-def book_list():
-    books = Book.query.all()
-    return render_template('book_list.html', books=books)
+# 编辑页面（GET显示表单）
+@blue.route('/machine/edit/<int:machine_id>/<int:user_id>')
+def machine_edit(machine_id,user_id):
+    machine = BaseMachine.query.get_or_404(machine_id)
+    current_user = User.query.get(user_id)
+    return render_template('stat/machine_edit.html', 
+                         machine=machine,
+                         current_user=current_user)
 
-@blue.route('/bookdetail/<int:bid>/')   # 路由传参
-def book_detail(bid):
-    book = Book.query.get(bid)
-    return render_template('book_detail.html', book=book)
+# 处理编辑提交（POST更新数据）
+@blue.route('/machine/update/<int:machine_id>/<int:user_id>', methods=['POST'])
+def machine_update(machine_id,user_id):
+    machine = BaseMachine.query.get_or_404(machine_id)
+    try:
+        # 更新机床信息
+        machine.m_number = request.form.get('m_number')
+        machine.m_name = request.form.get('m_name')
+        machine.m_state = request.form.get('m_state')
+        machine.m_workshop = request.form.get('m_workshop')
+        machine.m_time = float(request.form.get('m_time', 0))  # 确保 m_time 是浮点数
+        
+        db.session.commit()
+        # flash('更新成功', 'success')
+    except Exception as e:
+        db.session.rollback()
+        # flash(f'更新失败: {str(e)}', 'danger')
+    
+    return redirect(url_for('book.machine_list', bid=user_id))
 
-# 作者详情
-@blue.route('/authordetail/<int:aid>/')   # 路由传参
-def author_detail(aid):
-    author = Author.query.get(aid)
-    return render_template('author_detail.html', author=author)         # 渲染 传参
 
-# 出版社详情
-@blue.route('/publisherdetail/<int:pid>/')   # 路由传参
-def publisher_detail(pid):
-    publisher = Publisher.query.get(pid)
-    return render_template('publisher_detail.html', publisher=publisher)'''
+@blue.route('/workpiece/<int:bid>')
+def workpiece_list(bid):
+    pieces = Workpiece.query.all()
+    current_user = User.query.get(bid)
+    return render_template('workpiece/list.html', pieces=pieces, current_user=current_user)
+
+@blue.route('/workpiece/add/<int:user_id>', methods=['GET', 'POST'])
+def workpiece_add(user_id):
+    if request.method == 'POST':
+        try:
+            # 获取表单数据
+            j_id = request.form['j_id']  # 新增的工件ID字段
+            j_number = request.form['j_number']
+            c_name = request.form['c_name']
+            p_number = request.form['p_number']
+            j_quantity = int(request.form['j_quantity'])
+            
+            # 处理时间字段（datetime-local 格式: "YYYY-MM-DDTHH:MM"）
+            j_create_date = datetime.strptime(
+                request.form['j_create_date'], 
+                '%Y-%m-%dT%H:%M'
+            ) if request.form['j_create_date'] else None
+            
+            j_due_date = datetime.strptime(
+                request.form['j_due_date'], 
+                '%Y-%m-%dT%H:%M'
+            ) if request.form['j_due_date'] else None
+            
+            j_remark = request.form.get('j_remark', '')
+
+            # 创建新工件对象
+            new_piece = Workpiece(
+                j_id=j_id,  # 新增字段
+                j_number=j_number,
+                c_name=c_name,
+                p_number=p_number,
+                j_quantity=j_quantity,
+                j_create_date=j_create_date,  # 新增字段
+                j_due_date=j_due_date,
+                j_remark=j_remark,
+            )
+
+            db.session.add(new_piece)
+            db.session.commit()
+            flash('添加成功', 'success')
+            return redirect(url_for('book.workpiece_list', bid=user_id))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'添加失败: {str(e)}', 'danger')
+    current_user = User.query.get(user_id)
+    return render_template('workpiece/add.html', current_user=current_user)
+
+@blue.route('/workpiece/delete/<int:j_id>/<int:user_id>', methods=['POST'])
+def workpiece_delete(j_id, user_id):
+    piece = Workpiece.query.get_or_404(j_id)
+    db.session.delete(piece)
+    db.session.commit()
+    flash('删除成功', 'success')
+    return redirect(url_for('book.workpiece_list', bid=user_id))
+
+
+@blue.route('/operation/<int:bid>')
+def operation_list(bid):
+    operations = Operation.query.all()
+    current_user = User.query.get(bid)
+    return render_template('operation/list.html', operations=operations, current_user=current_user)
+
+@blue.route('/operation/add/<int:user_id>', methods=['GET', 'POST'])
+def operation_add(user_id):
+    if request.method == 'POST':
+        try:
+            # 获取表单数据
+            o_id = request.form['o_id']
+            o_name = request.form.get('o_name', '')
+            o_number = request.form.get('o_number', 0) 
+            o_job_id = request.form['o_job_id']
+            o_machine_name = request.form['o_machine_name']
+            o_time = int(request.form['o_time'])
+            
+            # 验证工件是否存在
+            workpiece = Workpiece.query.get(o_job_id)
+            if not workpiece:
+                flash('错误: 指定的工件ID不存在', 'danger')
+                return redirect(url_for('book.operation_list', bid=user_id))
+            
+            # 检查工序ID是否已存在
+            if Operation.query.get(o_id):
+                flash('错误: 工序ID已存在', 'danger')
+                return redirect(url_for('book.operation_list', bid=user_id))
+            
+            # 创建新工序
+            new_operation = Operation(
+                o_id=o_id,
+                o_name=o_name,
+                o_number=o_number,
+                o_job_id=o_job_id,
+                o_machine_name=o_machine_name,
+                o_time=o_time
+            )
+            
+            db.session.add(new_operation)
+            db.session.commit()
+            
+            flash('工序添加成功!', 'success')
+        except ValueError:
+            db.session.rollback()
+            flash('错误: 加工时间必须是有效的数字', 'danger')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'添加失败: {str(e)}', 'danger')
+    return redirect(url_for('book.operation_list', bid=user_id))
+
+@blue.route('/operation/delete/<int:j_id>/<int:user_id>', methods=['POST'])
+def operation_delete(j_id, user_id):
+    operation = Operation.query.get_or_404(j_id)
+    db.session.delete(operation)
+    db.session.commit()
+    flash('删除成功', 'success')
+    return redirect(url_for('book.operation_list', bid=user_id))
+
+@blue.route('/operation/<int:j_id>/<int:user_id>', methods=['POST'])
+def operation_list_by_id(j_id, user_id):
+    # 根据 workpiece_id 筛选工序
+    operations = Operation.query.filter_by(o_job_id=j_id).all()
+    current_user = User.query.get(user_id)
+    return render_template('operation/list_by_id.html',j_id = j_id, operations=operations, current_user=current_user)
+
+@blue.route('/schedule/a/<int:bid>')
+def schedule_static(bid):
+    current_user = User.query.get(bid)
+    return render_template('schedule/schedule_static.html',  current_user=current_user)
+
+@blue.route('/schedule/b/<int:bid>')
+def schedule_dynamic(bid):
+    current_user = User.query.get(bid)
+    return render_template('schedule/schedule_dynamic.html', current_user=current_user)
+
+
+@blue.route('/static_algorithm/<int:bid>', methods=['GET', 'POST'])
+def static_algorithm(bid):
+    result_image = None
+    current_user = User.query.get(bid)
+    if request.method == 'POST':
+        action = request.form.get('action')
+        
+        if action == 'run':
+            # 获取表单参数
+            params = {
+                'fitness_0': float(request.form.get('fitness_0')),
+                'fitness_1': float(request.form.get('fitness_1')),
+                'fitness_2': float(request.form.get('fitness_2')),
+                'pop_size': int(request.form.get('pop_size')),
+                'gene_size': int(request.form.get('gene_size')),
+                'clone_size': int(request.form.get('clone_size')),
+                'pc': float(request.form.get('pc')),
+                'pm': float(request.form.get('pm'))
+            }
+            # 验证适应度权重总和≈1.0
+            fitness_sum = sum(float(params[k]) for k in ['fitness_0', 'fitness_1', 'fitness_2'])
+            if not math.isclose(fitness_sum, 1.0, abs_tol=0.001):
+                flash(f'适应度权重总和必须等于1.0(当前: {fitness_sum:.3f})', 'danger')
+
+            try:
+                # 执行算法脚本 subprocess.run() 要求所有命令行参数都必须是字符串类型，但您直接传递了Python的float类型数值。
+                cmd = [
+                    'python', 'static_algorithm/Algorithm.py',
+                    '--fitness_0', str(params['fitness_0']),  # 转换为字符串
+                    '--fitness_1', str(params['fitness_1']),
+                    '--fitness_2', str(params['fitness_2']),
+                    '--pop_size', str(params['pop_size']),
+                    '--gene_size', str(params['gene_size']),
+                    '--clone_size', str(params['clone_size']),
+                    '--pc', str(params['pc']),
+                    '--pm', str(params['pm'])
+                ]
+                subprocess.run(cmd, check=True)
+                result_image = 1
+                # 假设算法生成的结果图片
+                flash('算法执行成功!', 'success')
+                
+            except Exception as e:
+                flash(f'算法执行失败: {str(e)}', 'danger')
+                
+
+    
+    return render_template('schedule/schedule_static.html',  current_user=current_user, result_image= result_image)

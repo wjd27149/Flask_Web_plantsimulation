@@ -1,0 +1,67 @@
+{% extends "common/layout_main.html" %}
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h4>编辑机床信息</h4>
+        </div>
+        <div class="card-body">
+            <form action="{{ url_for('book.machine_update', machine_id=machine.m_id, user_id=current_user.id) }}" method="POST">
+                
+                <!-- 机器ID -->
+                <div class="mb-3">
+                    <label class="form-label">机器ID</label>
+                    <input type="text" class="form-control" 
+                           name="m_id" value="{{ machine.m_id }}" readonly>
+                </div>
+                
+                <!-- 机床编码 -->
+                <div class="mb-3">
+                    <label class="form-label">机床编码</label>
+                    <input type="text" class="form-control" 
+                           name="m_number" value="{{ machine.m_number }}" required>
+                </div>
+                
+                <!-- 机床名称 -->
+                <div class="mb-3">
+                    <label class="form-label">机床名称</label>
+                    <input type="text" class="form-control" 
+                           name="m_name" value="{{ machine.m_name }}" required>
+                </div>
+                
+                <!-- 机床状态 -->
+                <div class="mb-3">
+                    <label class="form-label">机床状态</label>
+                    <select class="form-select" name="m_state">
+                        <option value="待机" {% if machine.m_state == '待机' %}selected{% endif %}>待机</option>
+                        <option value="运行" {% if machine.m_state == '运行' %}selected{% endif %}>运行</option>
+                        <option value="维修" {% if machine.m_state == '维修' %}selected{% endif %}>维修</option>
+                        <option value="停机" {% if machine.m_state == '停机' %}selected{% endif %}>停机</option>
+                    </select>
+                </div>
+                
+            <!-- 所在车间 -->
+            <div class="mb-3">
+                <label class="form-label">所在车间</label>
+                <input type="text" class="form-control" 
+                    name="m_workshop" value="{{ machine.m_workshop }}" required>
+            </div>
+
+            <!-- 运行时间 -->
+            <div class="mb-3">
+                <label class="form-label">累计运行时间（小时）</label>
+                <input type="number" class="form-control" 
+                    name="m_time" value="{{ machine.m_time }}" step="0.01" min="0" required>
+            </div>
+                
+                <!-- 操作按钮 -->
+                <div class="text-end">
+                    <a href="{{ url_for('book.machine_list', bid=current_user.id) }}" 
+                       class="btn btn-secondary">取消</a>
+                    <button type="submit" class="btn btn-primary ms-2">保存更改</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

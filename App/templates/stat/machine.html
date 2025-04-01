@@ -10,50 +10,67 @@
     </div>
 </div>
 
-<div class="row m-t">
-    <div class="col-lg-12 m-t">
-    {% with messages=get_flashed_messages(with_categories=True) %}
-    {% if messages %}
-        {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">{{ message }}</div>
-        {% endfor %}
-        {% endif %}
-    {% endwith %}
-    <!--h1 class="mt-5">Delete BaseMachine Data</h1> 
+    <div class="row m-t">
+        <div class="col-lg-12 m-t">
+        {% with messages=get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+        {% endwith %}
+            
         
-    <!-- 使用 Bootstrap 表单和按钮 -->
-    <form action="/add_basemachine/{{current_user.id}}" method="POST" class="mt-4"  style="display:inline;">
-        <button type="submit" class="btn btn-success btn-lg" 
-                onclick="return confirm('Are you sure you want to add machines by default?');">
-            Add BaseMachine Records
-        </button>
-    </form>  
+    <div class="custom-flex-between">
+        <!-- 删除按钮 (左) -->
+        <form action="/delete_basemachine/{{current_user.id}}" method="POST" class="m-0 d-inline-flex">
+            <button type="submit" class="btn btn-danger btn-lg">
+                <i class="fas fa-trash"></i> 删除所有
+            </button>
+        </form>
+        
+        <!-- 添加按钮（右） -->
+        <form action="{{ url_for('book.add_machine', user_id=current_user.id) }}" method="POST" class="d-inline">
+            <button type="submit" class="btn btn-success btn-lg">
+                <i class="fas fa-plus"></i> 插入机器
+            </button>
+        </form>
+    </div>
 
-    <form action="/delete_basemachine/{{current_user.id}}" method="POST" class="mt-4"  style="display:inline;">
-        <button type="submit" class="btn btn-danger btn-lg" 
-                onclick="return confirm('Are you sure you want to delete all records?');">
-            Delete All BaseMachine Details Records
-        </button>
-    </form>    
   
         <table class="table table-bordered m-t">
             <thead>
             <tr>
-                <th class="text-center">id</th>
-                <th class="text-center">name</th>
-                <th class="text-center">type</th>
-                <th class="text-center">link</th>
+                <th class="text-center">机床ID</th>
+                <th class="text-center">机床编码</th>
+                <th class="text-center">机床名称</th>
+                <th class="text-center">机床状态</th>
+                <th class="text-center">运行时间(小时)</th>
+                <th class="text-center">所在车间</th>
+                <th class="text-center">操作</th>
             </tr>
             </thead>
             <tbody>
                 {% if machines %}
                     {% for machine in machines %}
                 <tr>
-                    <td class="text-center">{{ machine.id }}</td>
-                    <td class="text-center">{{ machine.name }}</td>
-                    <td class="text-center">{{ machine.type }}</td>
+                    <td class="text-center">{{ machine.m_id }}</td>
+                    <td class="text-center">{{ machine.m_number }}</td>
+                    <td class="text-center">{{ machine.m_name }}</td>
+                    <td class="text-center">{{ machine.m_state }}</td>
+                    <td class="text-center">{{ "%.1f"|format(machine.m_time) if machine.m_time else 0.0 }}</td>
+                    <td class="text-center">{{ machine.m_workshop }}</td>
                     <td class="text-center">
-                        <a href="{{ url_for('book.machine_detail', id=machine.id, bid = current_user.id, _name = machine.name) }}" class="btn btn-warning">显示</a>
+                        <form action="{{ url_for('book.machine_delete',machine_id=machine.m_id,user_id=current_user.id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('确定删除吗？')">
+                                删除
+                            </button>
+                        </form>
+                            <!-- 编辑按钮（跳转到编辑页面） -->
+                        <a href="{{ url_for('book.machine_edit', machine_id=machine.m_id,user_id=current_user.id) }}" 
+                            class="btn btn-primary btn-sm me-2">
+                            <i class="fas fa-edit"></i> 编辑
+                        </a>
                     </td>
                 </tr>
                     {% endfor %}

@@ -1,0 +1,4 @@
+pro_type jobs_num operations_num cm_5_time cm_6_time cm_7_time
+300 3 4 6 6 -
+500 3 4 8 8 -
+800 3 4 8 8 12

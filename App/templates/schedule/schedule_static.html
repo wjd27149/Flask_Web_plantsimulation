@@ -1,0 +1,132 @@
+{% extends "common/layout_main.html" %}
+{% block content %}
+<div class="row border-bottom">
+    <div class="col-lg-12">
+        <div class="tab_title">
+            <ul class="nav nav-pills"></ul>
+        </div>
+    </div>
+</div>
+
+<div class="container" style="max-width: 800px;">
+    <h2 class="text-center text-primary border p-3 m-t-md">
+        NISGAA算法调度器
+    </h2>
+    
+    <div class="row m-t">
+        <div class="col-lg-12">
+            {% with messages=get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+            
+            <div class="panel panel-default" style="padding: 20px; border-radius: 5px;">
+                <form class="m-t" role="form" method="post"  action="{{ url_for('book.static_algorithm', bid=current_user.id) }}">
+                    <div class="row">
+                        <!-- 第一列 -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <input type="number" class="form-control" name="fitness_0" placeholder="目标1权重 (fitness_0)" value="0.8" min="0" max="1" step="0.01" required>
+                                <small class="text-muted">第一目标函数比例 (默认: 0.8)</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <input type="number" class="form-control" name="fitness_1" placeholder="目标2权重 (fitness_1)" value="0.1" min="0" max="1" step="0.01" required>
+                                <small class="text-muted">第二目标函数比例 (默认: 0.1)</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <input type="number" class="form-control" name="fitness_2" placeholder="目标3权重 (fitness_2)" value="0.1" min="0" max="1" step="0.01" required>
+                                <small class="text-muted">第三目标函数比例 (默认: 0.1)</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <input type="number" class="form-control" name="pop_size" placeholder="种群大小 (pop_size)" value="120" min="1" required>
+                                <small class="text-muted">遗传算法的种群大小 (默认: 120)</small>
+                            </div>
+                        </div>
+                        
+                        <!-- 第二列 -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <input type="number" class="form-control" name="gene_size" placeholder="迭代代数 (gene_size)" value="50" min="1" required>
+                                <small class="text-muted">遗传算法的迭代代数 (默认: 59)</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <input type="number" class="form-control" name="clone_size" placeholder="克隆数量 (clone_size)" value="60" min="1" required>
+                                <small class="text-muted">克隆操作的数量 (默认: 60)</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <input type="number" class="form-control" name="pc" placeholder="交叉概率 (pc)" value="0.8" min="0" max="1" step="0.01" required>
+                                <small class="text-muted">交叉操作概率 (默认: 0.8)</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <input type="number" class="form-control" name="pm" placeholder="变异概率 (pm)" value="0.05" min="0" max="1" step="0.01" required>
+                                <small class="text-muted">变异操作概率 (默认: 0.05)</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group text-center" style="clear: both; padding-top: 20px;">
+                        <button type="submit" name="action" value="run" class="btn btn-primary m-r-md" style="min-width: 120px;">运行算法</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="panel panel-default text-center m-t-md" style="padding: 20px; border-radius: 5px;">
+                <div id="loadingIndicator" style="display: none;">
+                    <img src="{{ url_for('static', filename='images/loading.gif') }}" width="50" alt="加载中...">
+                    <p class="text-muted">算法执行中，请稍候...</p>
+                </div>
+                
+                <div id="resultContainer">
+                    <h4>算法结果</h4>
+                    {% if result_image %}
+                        <div style="max-width: 600px; margin: 0 auto;">
+                            <img src="{{ url_for('static', filename='static_result_chart/nsga.png' ) }}" class="img-responsive center-block" style="max-height: 400px;">
+                            <p class="m-t-sm">
+                                <a href="{{ url_for('static', filename='static_result_chart/nsga.png') }}" download="算法结果.png" class="btn btn-xs btn-default">
+                                    <i class="fa fa-download"></i> 下载结果
+                                </a>
+                            </p>
+                        </div>
+                    {% else %}
+                        <div class="p-lg" style="max-width: 600px; margin: 0 auto;">
+                            <i class="fa fa-bar-chart-o fa-5x text-muted"></i>
+                            <p class="m-t-md text-muted">结果将在此处显示</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+$(document).ready(function() {
+    $('form').submit(function(e) {
+        var action = $(document.activeElement).attr('value');
+        
+        if (action === 'run') {
+            $('#loadingIndicator').show();
+            $('#resultContainer').hide();
+        } else if (action === 'reset') {
+            this.reset();
+            return false;
+        }
+    });
+    
+    {% if result_image %}
+        $('#resultContainer').show();
+    {% endif %}
+});
+</script>
+{% endblock %}
