@@ -261,7 +261,8 @@ def operation_add(user_id):
             o_number = request.form.get('o_number', 0) 
             o_job_id = request.form['o_job_id']
             o_machine_name = request.form['o_machine_name']
-            o_time = int(request.form['o_time'])
+            o_time = request.form.get('o_time')  # 加工时间
+            o_index = request.form.get('o_index')  # 新增字段，默认值为0
             
             # 验证工件是否存在
             workpiece = Workpiece.query.get(o_job_id)
@@ -281,7 +282,8 @@ def operation_add(user_id):
                 o_number=o_number,
                 o_job_id=o_job_id,
                 o_machine_name=o_machine_name,
-                o_time=o_time
+                o_time=o_time,
+                o_index=o_index,  # 新增字段
             )
             
             db.session.add(new_operation)

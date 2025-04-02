@@ -41,10 +41,10 @@
         <table class="table table-bordered m-t">
             <thead>
             <tr>
-                <th class="text-center">机床ID</th>
-                <th class="text-center">机床编码</th>
-                <th class="text-center">机床名称</th>
-                <th class="text-center">机床状态</th>
+                <th class="text-center">机器ID</th>
+                <th class="text-center">机器编码</th>
+                <th class="text-center">机器名称</th>
+                <th class="text-center">机器状态</th>
                 <th class="text-center">运行时间(小时)</th>
                 <th class="text-center">所在车间</th>
                 <th class="text-center">操作</th>
@@ -61,16 +61,17 @@
                     <td class="text-center">{{ "%.1f"|format(machine.m_time) if machine.m_time else 0.0 }}</td>
                     <td class="text-center">{{ machine.m_workshop }}</td>
                     <td class="text-center">
-                        <form action="{{ url_for('book.machine_delete',machine_id=machine.m_id,user_id=current_user.id) }}" method="POST" style="display:inline;">
-                            <button type="submit" class="btn btn-danger" onclick="return confirm('确定删除吗？')">
-                                删除
-                            </button>
-                        </form>
                             <!-- 编辑按钮（跳转到编辑页面） -->
                         <a href="{{ url_for('book.machine_edit', machine_id=machine.m_id,user_id=current_user.id) }}" 
                             class="btn btn-primary btn-sm me-2">
                             <i class="fas fa-edit"></i> 编辑
                         </a>
+                        <form action="{{ url_for('book.machine_delete',machine_id=machine.m_id,user_id=current_user.id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('确定删除吗？')">
+                                删除
+                            </button>
+                        </form>
+
                     </td>
                 </tr>
                     {% endfor %}

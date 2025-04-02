@@ -7,7 +7,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>WORKFLOW</title>
+    <title>Schedule System</title>
 
 <link href="/static/new/css/bootstrap.min.css" rel="stylesheet">
 <link href="/static/new/font-awesome/css/font-awesome.css" rel="stylesheet">
@@ -40,7 +40,7 @@
                 </div>
 
             </div>
-            <h3>欢迎使用工单管理系统</h3>
+            <h3 style="margin-top: 20px; margin-bottom: 20px;">欢迎使用绝缘子柔性车间调度管理系统</h3>
             {% for message in get_flashed_messages() %}
                 {% if message.category == 'success' %}
                     <div class="alert alert-success">{{ message }}</div>
@@ -68,7 +68,7 @@
             <form method = "get" action="{{ url_for('book.register') }}">          <!-- 这里不能用post-->
                 <button type="submit" class="btn btn-primary m-b">注册</button>
             </form>
-            <p class="m-t"> <small>WORKFLOW &copy; 2024</small> </p>
+            <p class="m-t"> <small>Schedule System &copy; 2025</small> </p>
         </div>
     </div>
 

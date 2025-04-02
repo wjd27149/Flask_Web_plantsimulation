@@ -357,9 +357,12 @@ if __name__ == "__main__":
 
     n, m, job_num_list, n_name, ni,total_ni, CMT, CMT_M, MT, PT = get_instance(); 
     args = get_args(n, m, job_num_list , n_name, ni, total_ni, CMT, CMT_M, MT, PT)
+    s_time = time.time()
+
     A = Algorithm(args= args)
     A.initial()
     best_chs_list = []
+    
     # Python中，取反操作符是 not 而不是 ! 。 Python 解释器会报错，因为它不识别 ! 作为取反操作符。
     while not (A.circle_over()):
         A.divide_population()
@@ -371,8 +374,8 @@ if __name__ == "__main__":
     best_LOAD = [best.load for best in best_chs_list]
     best_CMT = [best.total_CMT for best in best_chs_list]
 
-
-    Gantt_chart(A.best_chs, m ,n)
+    t = round(time.time() - s_time, 2)
+    Gantt_chart(A.best_chs, m ,n, t)
     print(A.best_chs.CHS)
     print(best_CMAX)
     print(best_LOAD)

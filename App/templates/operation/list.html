@@ -46,6 +46,10 @@
                     <label class="form-label">加工时间(分钟)*</label>
                     <input type="number" name="o_time" class="form-control" required min="1">
                 </div>
+                <div class="col-md-3">
+                    <label class="form-label">加工系数</label>
+                    <input type="number" name="o_index" class="form-control" required min="1">
+                </div>
                 <div class="col-md-10 text-center">  <!-- 调整列宽 -->
                     <button type="submit" class="btn btn-primary w-100">添加</button>
                 </div>
@@ -57,30 +61,37 @@
         <table class="table table-hover">
             <thead>
                 <tr>
-                    <th>工序ID</th>
-                    <th>工序名称</th>
-                    <th>工序编码</th>
-                    <th>工件ID</th>
-                    <th>机器名称</th>
-                    <th>加工时间</th>
+                    <th class="text-center">工序ID</th>
+                    <th class="text-center">工序名称</th>
+                    <th class="text-center">工序编码</th>
+                    <th class="text-center">工件ID</th>
+                    <th class="text-center">机器名称</th>
+                    <th class="text-center">加工时间</th>
+                    <th class="text-center">加工系数</th>
+                    <th class="text-center">操作</th>
                 </tr>
             </thead>
             <tbody>
                 {% for op in operations %}
                 <tr>
-                    <td>{{ op.o_id }}</td>
-                    <td>{{ op.o_name }}</td>
-                    <td>{{ op.o_number }}</td>
-                    <td>{{ op.o_job_id }}</td>
-                    <td>{{ op.o_machine_name }}</td>
-                    <td>{{ op.o_time }}分钟</td>
-                    <td>
-                        <form method="POST" 
-                              action="{{ url_for('book.operation_delete', j_id=op.o_id, user_id=current_user.id) }}"
-                              onsubmit="return confirm('确定删除此工序吗？')">
-                            <button type="submit" class="btn btn-sm btn-danger">删除</button>
-                        </form>
+                    <td class="text-center">{{ op.o_id }}</td>
+                    <td class="text-center">{{ op.o_name }}</td>
+                    <td class="text-center">{{ op.o_number }}</td>
+                    <td class="text-center">{{ op.o_job_id }}</td>
+                    <td class="text-center">{{ op.o_machine_name }}</td>
+                    <td class="text-center">{{ op.o_time }}</td>
+                    <td class="text-center">{{ op.o_index }}</td>
+                    <td class="text-center">
+                        <div style="display: flex; align-items: center; gap: 5px; justify-content: center;">
+                            <a href="#" class="btn btn-sm btn-warning">编辑</a>
+                            <form method="POST" 
+                                  action="{{ url_for('book.operation_delete', j_id=op.o_id, user_id=current_user.id) }}"
+                                  onsubmit="return confirm('确定删除此工序吗？')" style="margin: 0;">
+                                <button type="submit" class="btn btn-sm btn-danger">删除</button>
+                            </form>
+                        </div>
                     </td>
+                    
                 </tr>
                 {% else %}
                 <tr>

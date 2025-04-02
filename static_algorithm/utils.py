@@ -3,7 +3,7 @@ import numpy as np
 import random
 import os
 import time           
-def Gantt_chart(CHS, m: int, n: int):
+def Gantt_chart(CHS, m: int, n: int, a_t):
     '''绘制甘特图
     '''
     # 定义颜色列表
@@ -39,7 +39,7 @@ def Gantt_chart(CHS, m: int, n: int):
     plt.yticks(list(range(m)),
         ['machine%d'% (i+1) for i in range(m)])
     plt.rcParams['font.sans-serif'] = 'SimHei' 
-    plt.title(f'最大完工时间 : {CHS.C_max}/min     机器总时间负荷 : {CHS.load}/min     总换模时间 : {CHS.total_CMT}/min')
+    plt.title(f'最大完工时间 : {CHS.C_max}/min     机器总时间负荷 : {CHS.load}/min     总换模时间 : {CHS.total_CMT}/min   算法运行时间 : {a_t}/s',fontsize=14)
     plt.xlabel('时间/min', fontdict={'fontsize': 12})
     # 1. 定义正确的目标目录路径（注意路径分隔符和目录名一致性）
     target_dir = os.path.join("APP", "static", "static_result_chart")  # 与makedirs保持一致
