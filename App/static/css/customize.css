@@ -3,3 +3,25 @@
     display: flex;
     justify-content: space-between;
 }
+
+
+.status-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+    background-color: #1ab394; /* 默认红色（未连接状态）ed5565 */
+}
+
+.status-text {
+    color: #676a6c; /* 默认文字颜色 */
+}
+
+.connected .status-indicator {
+    background-color: #ed5565; /* 连接状态绿色 1ab394*/
+}
+
+.connected .status-text {
+    color: #676a6c; /* 保持文字颜色不变 */
+}

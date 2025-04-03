@@ -2,13 +2,32 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 import os
-import time           
+import time
+class Info_2_send:
+    def __init__(self, name, operation, machine, start_time, proc_time):
+        self.name = name
+        self.operation = operation
+        self.machine = machine
+        self.start_time = start_time
+        self.proc_time = proc_time
+    def __repr__(self):
+        return (f"Info_2_send(name={self.name}, operation={self.operation}, "
+                f"machine={self.machine}, start_time={self.start_time}, "
+                f"proc_time={self.proc_time})")
+
 def Gantt_chart(CHS, m: int, n: int, a_t):
     '''绘制甘特图
     '''
+    info_list = []
     # 定义颜色列表
     colors = ['green', 'orange', 'purple', 'cyan', 'magenta', 'brown', 'lime', 'pink', 'teal', 'lavender']
     plt.figure(figsize=(m*2, m))
+    first_row_total_jobs = len(CHS.jobs)
+    first_row_split_jobs = int(len(CHS.jobs)/3)
+    first_row_split_operation = 4
+    first_row_split_info = 5
+    # 分别代表 所有工件数 每种工件数 每种工件的工序总数 每种工序包括的信息数
+    first_row = [first_row_total_jobs,first_row_split_jobs, first_row_split_operation, first_row_split_info]
     #   绘制常规工序
     for i in range(len(CHS.jobs)):
         sum = len(CHS.jobs[i].start)
@@ -23,8 +42,12 @@ def Gantt_chart(CHS, m: int, n: int, a_t):
             plt.text(x=(b - a) / 2 + a, y=c - 1, s=f"{CHS.jobs[i].name}/{t}",
                         horizontalalignment='center',fontsize=8)
             t += 1
-            # print(f' operation: {CHS.jobs[i].index}  on {c} mac start_time: {a} end_time: {b} op_time: {b-a}')
-    
+            info_list.append(Info_2_send(CHS.jobs[i].name, t, c, a, b-a))
+            # print(f' job : {CHS.jobs[i].name}  operation: {t}  on {c} mac start_time: {a} end_time: {b} op_time: {b-a}')
+
+    # 2. 按工序号排序
+    info_list.sort(key=lambda x: x.operation)
+
     #绘制换模工序
     for i in (CHS.CMT_M):
         i = i - 1
@@ -49,10 +72,19 @@ def Gantt_chart(CHS, m: int, n: int, a_t):
 
     # 3. 定义最终保存路径
     target_path = os.path.join(target_dir, 'nsga.png')  # 使用os.path.join确保跨平台兼容
-
+    file_path = os.path.join(target_dir, 'scheduling_info.txt')
     # 4. 保存图片（添加bbox_inches='tight'避免截断内容）
     plt.savefig(target_path, bbox_inches='tight', dpi=300)  # 添加dpi提高图片质量
 
+    # 3. 保存到txt文件
+    with open(file_path, 'w') as f:
+        # 1. 写入第一行统计数据（用逗号分隔）
+        f.write(','.join(map(str, first_row)) + '\n')
+        # 写入每条记录
+        for info in info_list:
+            line = f"{info.name},{info.operation},{info.machine},{info.start_time},{info.proc_time}\n"
+            f.write(line)
+            
     # 5. 显示图片（可选）
     # plt.show()
 

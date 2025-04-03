@@ -17,7 +17,7 @@ def get_args(n, m,job_num_list, n_name, ni,total_ni, CMT, CMT_M, MT, PT):
 
     # Params for Algorithms
     parser.add_argument('--pop_size', default= 120, type=int, help='Population size of the genetic algorithm')         # 100
-    parser.add_argument('--gene_size', default= 100, type=int, help='generation size of the genetic algorithm')      #100
+    parser.add_argument('--gene_size', default= 1, type=int, help='generation size of the genetic algorithm')      #100
     parser.add_argument('--pc_max', default=0.8, type=float, help='Crossover rate')                                 #0.8
     parser.add_argument('--pm_max', default=0.05, type=float, help='mutation rate')                                 #0.2
     parser.add_argument('--pc_min', default=0.7, type=float, help='Crossover rate')                                 # 0.7

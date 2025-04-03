@@ -1,40 +1,118 @@
 {% extends "common/layout_main.html" %}
 {% block content %}
-<div class="row  border-bottom">
-    <div class="col-lg-12">
-        <div class="tab_title">
-            <ul class="nav nav-pills">
 
-            </ul>
+<div class="container" style="max-width: 800px;">
+    <!-- 仿真时间 -->
+    <div class="card border-success shadow-sm mb-4">
+        <div class="card-body border border-success rounded p-3">
+            <h1 class="text-success fw-bold text-center">
+                仿真时间: <span id="sim_time">0.00</span>
+            </h1>
+        </div>
+    </div>
+
+    <!-- 生产数据 -->
+    <div class="card border-dark shadow-sm mb-4">
+        <div class="card-body border border-dark rounded p-3">
+            <h2 class="text-center text-dark fw-bold mb-3">生产数据</h2>
+            <div class="row text-center">
+                <div class="col-md-4">
+                    <h4 class="text-dark">工件总数</h4>
+                    <p class="fs-5 fw-bold text-dark"><span id="total_jobs">0</span></p>
+                </div>
+                <div class="col-md-4">
+                    <h4 class="text-dark">已完成工件数</h4>
+                    <p class="fs-5 fw-bold text-dark"><span id="completed_jobs">0</span></p>
+                </div>
+                <div class="col-md-4">
+                    <h4 class="text-dark">工件完成率</h4>
+                    <p class="fs-5 fw-bold text-dark"><span id="job_completion_rate">0.00%</span></p>
+                </div>
+                <div class="col-md-4">
+                    <h4 class="text-dark">工序总数</h4>
+                    <p class="fs-5 fw-bold text-dark"><span id="total_operations">0</span></p>
+                </div>
+                <div class="col-md-4">
+                    <h4 class="text-dark">已完成工序数</h4>
+                    <p class="fs-5 fw-bold text-dark"><span id="completed_operation">0</span></p>
+                </div>
+                <div class="col-md-4">
+                    <h4 class="text-dark">工序完成率</h4>
+                    <p class="fs-5 fw-bold text-dark"><span id="operation_completion_rate">0.00%</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 机器利用率 -->
+    <div class="card border-info shadow-sm">
+        <div class="card-body border border-info rounded p-3">
+            <h2 class="text-center text-info fw-bold mb-3">机器利用率</h2>
+            <table class="table table-bordered text-center">
+                <thead class="table-light">
+                    <tr>
+                        <th class="text-center">机器</th>
+                        <th class="text-center">利用率</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Crimping-1</td><td id="machine_1">0.00%</td></tr>
+                    <tr><td>Crimping-2</td><td id="machine_2">0.00%</td></tr>
+                    <tr><td>Drying-1</td><td id="machine_3">0.00%</td></tr>
+                    <tr><td>Drying-2</td><td id="machine_4">0.00%</td></tr>
+                    <tr><td>Injecting-1-550</td><td id="machine_5">0.00%</td></tr>
+                    <tr><td>Injecting-2-550</td><td id="machine_6">0.00%</td></tr>
+                    <tr><td>Injecting-1-1100</td><td id="machine_7">0.00%</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
-<div class="row m-t">
-    <div class="col-lg-12 m-t middle-box text-center">
-        {% with messages=get_flashed_messages(with_categories=True) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-            {% endif %}
-        {% endwith %}
-        <form class="m-t" role="form" method="post" action="">
-            <div class="form-group">
-                <input type="text" class="form-control" placeholder="机器数量" value="" name='machine_num' required="">
-            </div>
-            <div class="form-group">
-                <input type="text" class="form-control" name="material_num"  placeholder="材料数量" required="">
-            </div>
-            <button type="submit"  style="text-align:center" class="btn btn-primary block m-b">Run</button>
-            <button type="submit"  class="btn btn-primary block m-b">Reset</button>
+
+{% endblock %}
+
+{% block js %}
+<script>
+    function fetchLatestData() {
+        fetch('/get_latest_data')
+        .then(response => response.json())
+        .then(data => {
+            console.log("Fetched data:", data);
+
+            // 更新仿真时间
+            document.getElementById("sim_time").textContent = data.time;
+
+            // 更新工件数据
+            let totalJobs = parseFloat(data.total_jobs);
+            let completedJobs = parseFloat(data.completed_jobs);
+            let jobCompletionRate = totalJobs > 0 ? ((completedJobs / totalJobs) * 100).toFixed(2) + "%" : "0.00%";
             
-            <!--<a href="/accounts/resetpass/"><small>Forgot password?</small></a>-->
-            <!--<p class="text-muted text-center"><small>Do not have an account?</small></p>-->
-        </form>
-        <div class="form-group">
-        <input type="text" class="form-control" placeholder="求和" name="sum" value="{{ sum }}" />
-        </div>
-        <!--分页代码-->
-    </div>
-</div>
+            document.getElementById("total_jobs").textContent = totalJobs;
+            document.getElementById("completed_jobs").textContent = completedJobs;
+            document.getElementById("job_completion_rate").textContent = jobCompletionRate;
+
+            // 更新工序数据
+            let totalOperations = parseFloat(data.total_operations);
+            let completedOperations = parseFloat(data.completed_operation);
+            let operationCompletionRate = totalOperations > 0 ? ((completedOperations / totalOperations) * 100).toFixed(2) + "%" : "0.00%";
+
+            document.getElementById("total_operations").textContent = totalOperations;
+            document.getElementById("completed_operation").textContent = completedOperations;
+            document.getElementById("operation_completion_rate").textContent = operationCompletionRate;
+
+            // 更新机器利用率
+            document.getElementById("machine_1").textContent = data.machine_1;
+            document.getElementById("machine_2").textContent = data.machine_2;
+            document.getElementById("machine_3").textContent = data.machine_3;
+            document.getElementById("machine_4").textContent = data.machine_4;
+            document.getElementById("machine_5").textContent = data.machine_5;
+            document.getElementById("machine_6").textContent = data.machine_6;
+            document.getElementById("machine_7").textContent = data.machine_7;
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    }
+
+    // 每秒自动刷新数据
+    setInterval(fetchLatestData, 250);
+</script>
 {% endblock %}

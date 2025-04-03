@@ -1,6 +1,8 @@
 from __future__ import annotations      # 使用这个 第5行才不报错
 from FJSP_ENV import *
 import math
+from flask import current_app
+import json
 
 max_values = [0,0,0]
 min_values = [99999,99999,99999]
@@ -376,11 +378,10 @@ if __name__ == "__main__":
 
     t = round(time.time() - s_time, 2)
     Gantt_chart(A.best_chs, m ,n, t)
-    print(A.best_chs.CHS)
-    print(best_CMAX)
-    print(best_LOAD)
-    print(best_CMT)
-    print(best_GOAL)
-
+    # print(A.best_chs.CHS)
+    # print(best_CMAX)
+    # print(best_LOAD)
+    # print(best_CMT)
+    # print(best_GOAL)
 
         

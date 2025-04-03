@@ -88,8 +88,11 @@
                 </div>
                 <ul class="nav navbar-top-links navbar-right">
                     <li>
-						<span class="m-r-sm text-muted welcome-message" style="font-size:16px;">
-                            欢迎使用绝缘子柔性车间调度管理后台
+                        <span class="m-r-sm welcome-message" style="font-size:16px;">
+                            <span id="client-status" style="display: inline-flex; align-items: center;">
+                                <span class="status-indicator"></span>
+                                <span class="status-text">欢迎使用绝缘子柔性车间调度管理后台</span>
+                            </span>
                         </span>
                     </li>
                     <li class="dropdown user_info">
@@ -134,6 +137,36 @@
         {% endblock %}
     </div>
 </div>
+
+<script>
+// 检查客户端连接状态并更新显示
+function updateClientStatus() {
+    fetch('/check_client_status')
+        .then(response => response.json())
+        .then(data => {
+            const statusElement = document.getElementById('client-status');
+            if (data.connected) {
+                statusElement.classList.add('connected');
+                statusElement.classList.remove('disconnected');
+                statusElement.querySelector('.status-text').textContent = 
+                    'plant simulation未连接 | 欢迎使用绝缘子柔性车间调度管理后台';
+            } else {
+                statusElement.classList.add('disconnected');
+                statusElement.classList.remove('connected');
+                statusElement.querySelector('.status-text').textContent = 
+                    'plant simulation已连接 | 欢迎使用绝缘子柔性车间调度管理后台';
+            }
+        })
+        .catch(() => {
+            const statusElement = document.getElementById('client-status');
+            statusElement.classList.add('disconnected');
+            statusElement.classList.remove('connected');
+            statusElement.querySelector('.status-text').textContent = 
+                '连接状态检查失败 | 欢迎使用绝缘子柔性车间调度管理后台';
+        });
+}
+    window.addEventListener('load', updateClientStatus);
+    </script>
 
 <script src="/static/plugins/jquery-2.1.1.js"></script>
 <script src="/static/bootstrap/bootstrap.min.js"></script>

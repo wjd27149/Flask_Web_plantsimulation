@@ -1,6 +1,6 @@
 # 在views.py中放路由和视图函数
 
-from flask import Blueprint, request, render_template, url_for, redirect, flash, current_app, g
+from flask import Blueprint, request, render_template, url_for, redirect, flash, current_app, g, jsonify
  #后面是用views来控制数据库的，所以要在views中导入models文件                 flask db migrate 代码在这里实现
 from App.models.User.user_model import *
 from App.models.Machine.machine_model import *
@@ -14,6 +14,8 @@ from wtforms.validators import InputRequired, Email, Length
 # from Clients.client import client_send
 import subprocess  # 必须添加的导入
 import math
+
+import os
 
 # 蓝图
 blue = Blueprint('book', __name__)
@@ -349,6 +351,7 @@ def static_algorithm(bid):
                 flash(f'适应度权重总和必须等于1.0(当前: {fitness_sum:.3f})', 'danger')
 
             try:
+
                 # 执行算法脚本 subprocess.run() 要求所有命令行参数都必须是字符串类型，但您直接传递了Python的float类型数值。
                 cmd = [
                     'python', 'static_algorithm/Algorithm.py',
@@ -365,10 +368,39 @@ def static_algorithm(bid):
                 result_image = 1
                 # 假设算法生成的结果图片
                 flash('算法执行成功!', 'success')
+
+
+                # 获取全局client对象
+                client = current_app.config.get('client')
+                if not client:
+                    flash('客户端连接未初始化', 'danger')
+                    return redirect(url_for('book.static_algorithm', bid=bid))
+                # 打开文件并读取内容
+                    # 获取当前文件所在的目录
+                current_directory = os.path.dirname(os.path.abspath(__file__))
+                # 构建文件路径
+                file_path = os.path.join(current_directory, 'static', 'static_result_chart', 'scheduling_info.txt')
+                with open(file_path, 'r', encoding='utf-8') as file:
+                    lines = file.readlines()
+
+                # 将每行内容按顺序汇总成一个字符串，每行之间用逗号分隔  为了plant simulation 最后一个数据后面也要加一个”，“
+                result = ','.join([line.strip() for line in lines])
+                result += ","
+                # 发送结果
+                try:
+                    client.send(result.encode('utf-8'))
+                    flash(f'已发送结果: {result}', 'info')
+                except Exception as send_error:
+                    flash(f'结果发送失败: {str(send_error)} {result}', 'warning')
                 
             except Exception as e:
                 flash(f'算法执行失败: {str(e)}', 'danger')
                 
-
-    
     return render_template('schedule/schedule_static.html',  current_user=current_user, result_image= result_image)
+
+@blue.route('/check_client_status')
+def check_client_status():
+    client = current_app.config.get('client')
+    return jsonify({
+        'connected': client is not None and hasattr(client, 'connected') and client.connected
+    })
