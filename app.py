@@ -63,7 +63,6 @@ def get_latest_data():
     """前端请求最新的仿真数据"""
     with lock:  # 加锁
         if received_data:
-            print(f"返回最新数据: {received_data[-1]}")
             return jsonify(received_data[-1])  
         else:
             return jsonify({
@@ -83,20 +82,20 @@ def get_latest_data():
 if __name__ == '__main__':
 
     # # '''调用debug 模式'''
-    # run_flask_app_with_debug()
+    run_flask_app_with_debug()
 
-    ip = "127.0.0.1"
-    port = 3000
-    client = connect_Server(ip, port)
-    # 存储 client 在 current_app.config 中
-    app.config['client'] = client
-    try:
-        # 启动一个接受线程
-        recv_thread = threading.Thread(target=receive_messages, daemon=True)
+    # ip = "127.0.0.1"
+    # port = 3000
+    # client = connect_Server(ip, port)
+    # # 存储 client 在 current_app.config 中
+    # app.config['client'] = client
+    # try:
+    #     # 启动一个接受线程
+    #     recv_thread = threading.Thread(target=receive_messages, daemon=True)
         
-        recv_thread.start()
+    #     recv_thread.start()
 
-        # 在主线程运行 Flask（可以带调试模式）
-        app.run(host='127.0.0.1', port=5000, debug=False, threaded=True)
-    except Exception as e:
-        print(f"An error occurred: {e}")
+    #     # 在主线程运行 Flask（可以带调试模式）
+    #     app.run(host='127.0.0.1', port=5000, debug=False, threaded=True)
+    # except Exception as e:
+    #     print(f"An error occurred: {e}")
